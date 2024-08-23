@@ -1,6 +1,7 @@
 import asyncio
 import socket
 from server.handler import handle_data
+from server.debug import DEBUG_MODE, get_debug_data, print_debug_info
 
 class UDPServer:
     def __init__(self, ip_address, port):
@@ -18,13 +19,17 @@ class UDPServer:
 
         asyncio.create_task(self.worker())
 
-        while True:
-            data, address = await asyncio.wait_for(self.recvfrom(sock), timeout=None)
-            data: bytes
-            address: tuple
-            print(f"Received {len(data)} bytes from {address}")
-            print(f"Received data : {data.decode()}")
+        if DEBUG_MODE:
+            data, address = await get_debug_data()
             await self.queue.put((data, address, sock))
+            await asyncio.sleep(99999)
+
+        else:
+            while True:
+                data, address = await asyncio.wait_for(self.recvfrom(sock), timeout=None)
+                print(f"Received {len(data)} bytes from {address}")
+                print(f"Received data : {data.decode()}")
+                await self.queue.put((data, address, sock))
 
     async def recvfrom(self, sock: socket.socket):
         loop = asyncio.get_event_loop()

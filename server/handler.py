@@ -1,6 +1,6 @@
 import json
 import traceback
-from simulator.crawler import crawl_website
+from simulator.simulator import crawl_website
 
 async def handle_data(data: bytes) -> str:
     try:
