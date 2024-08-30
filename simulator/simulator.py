@@ -33,9 +33,13 @@ class Simulator:
         await page.goto('https://www.threekingdom100.com/')
         self.current_page = 'LoginPage'
         return await self.page.login(page, id, password)
-
         ## Login인지 Main인지 판단, 하지만 일단 Login으로 전제하고 구현
+    
+    async def language(self, page: Page, language: str):
+        await self.page.change_language(page, language)
 
+    async def season(self, page: Page, season: str):
+        await self.page.change_season(page, season)
 
 simulator = Simulator()
 
@@ -47,9 +51,8 @@ async def crawl_website(content: str) -> str:
         id: str = '01011111111'
         password: str = '1111'
         await simulator.login(page, id, password)
-
-        # await simulator.language('Korean')
-        # await simulator.season(2)
+        await simulator.language(page, "한국어")
+        await simulator.season(page, '2')
 
         crawled_content = await page.content()
         await browser.close()
