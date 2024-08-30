@@ -22,7 +22,7 @@ class UDPServer:
         if DEBUG_MODE:
             data, address = await get_debug_data()
             await self.queue.put((data, address, sock))
-            await asyncio.sleep(99999)
+            await asyncio.sleep(9999999)
 
         else:
             while True:

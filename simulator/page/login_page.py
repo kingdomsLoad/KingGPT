@@ -31,3 +31,5 @@ class LoginPage(IPage):
 
         # 뒤로가기 버튼
         await page.locator(".back-btn").click()
+
+        return 'MainPage'
