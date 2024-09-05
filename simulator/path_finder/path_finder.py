@@ -31,16 +31,10 @@ graph: Graph = {
     'BattlePage': ['DeckEditPage']
 }
 
-# 모든 경로 계산
-all_paths: AllPaths = bfs_all_paths(graph)
+# 모든 경로를 미리 계산하고 캐싱
+import asyncio
+all_paths: AllPaths = asyncio.run(bfs_all_paths(graph))
 
-# 결과 출력
-async def print_result():
-    for start_node in graph:
-        for end_node in graph:
-            if start_node != end_node:
-                paths: List[List[str]] = all_paths[start_node].get(end_node, [])
-                if paths:
-                    print(f'경로 {start_node} -> {end_node}: {paths[0]}')  # 첫 번째 경로만 출력
-                else:
-                    print(f'경로 {start_node} -> {end_node}: 존재하지 않음')
+def get_path(start: str, end: str) -> List[str]:
+    paths = all_paths.get(start, {}).get(end, [])
+    return paths[0] if paths else []

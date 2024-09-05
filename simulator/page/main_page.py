@@ -4,7 +4,10 @@ import re
 
 class MainPage(IPage):
     async def navigate(self, page: Page, next_page: str):
-        return await super().navigate(page, next_page)
+        if next_page == "DeckEditPage":
+            btn_lineup = page.locator('.lineup-btn')
+            await btn_lineup.click()
+            await page.wait_for_selector("uni-view.lineup-box", state="visible")
     
     async def change_language(self, page: Page, language: str):
         await page.get_by_text("简体中文").click()
