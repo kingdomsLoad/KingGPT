@@ -8,7 +8,7 @@ class DeckEditPage(IPage):
     async def navigate(self, page: Page, next_page: str):
         return await super().navigate(page, next_page)
     
-    async def deck_configuration(self, page: Page, army_type: str, heros: List[str], skills: List[List[str]]):
+    async def edit_deck(self, page: Page, army_type: str, heros: List[str], skills: List[List[str]]):
         # 1. teamSetting 덱 설정
         #   ㄴ 군사시설 사기, 병사전, 협력, 병영, 군영 레벨 조정
         await manage_team_setting(page, True)

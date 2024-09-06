@@ -6,7 +6,6 @@ from typing import Union, TYPE_CHECKING, List
 from functools import wraps
 from simulator.path_finder.path_finder import bfs_all_paths, get_path
 
-
 if TYPE_CHECKING:
     from simulator import Simulator
 
@@ -78,8 +77,7 @@ class Simulator:
 
         # path_find
         await self.navigate('DeckEditPage')
-        await self.page.deck_configuration(self.pw.page, army_type, heros, skills)
-        
+        await self.page.edit_deck(self.pw.page, army_type, heros, skills)
 
 simulator = Simulator()
 
