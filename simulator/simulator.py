@@ -32,6 +32,7 @@ class Simulator:
             'MainPage': MainPage(),
             'DeckEditPage': DeckEditPage()
         }
+
     async def start_browser(self, playwright: Playwright):
         self.pw.browser = await playwright.chromium.launch(headless=False)
         self.pw.context = await self.pw.browser.new_context(ignore_https_errors=True)  # 새로운 컨텍스트 생성 (기본적으로 시크릿 모드와 유사)
