@@ -16,7 +16,7 @@ class DeckEditPage(IPage):
     async def edit_deck(self, page: Page, army_type: str, heros: List[str], skills: List[List[str]]):
         # 1. teamSetting 덱 설정
         #   ㄴ 군사시설 사기, 병사전, 협력, 병영, 군영 레벨 조정
-        await self.team_setting.configure(page, True)# True는 Target_bool이 참
+        await self.team_setting.configure(page, False)# True는 Target_bool이 참
         # 2. del_btn 3개 장수 지우기 
         await self.lineup.delete_heros(page)
         # 3. army-type 선택하기

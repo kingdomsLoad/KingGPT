@@ -1,4 +1,4 @@
-from playwright.async_api import async_playwright, Page, Browser, Playwright
+from playwright.async_api import async_playwright, Page, Browser, Playwright, TimeoutError
 from simulator.page.login_page import LoginPage
 from simulator.page.main_page import MainPage
 from simulator.page.deck_edit_page import DeckEditPage
@@ -58,7 +58,17 @@ class Simulator:
 
     @update_current_page
     async def login(self, id: str, password: str):
-        await self.pw.page.goto('https://www.threekingdom100.com/')
+        try:
+            # 페이지 이동 시 타임아웃을 30초로 설정
+            await self.pw.page.goto('https://www.threekingdom100.com/', timeout=5000)
+            self.current_page = 'LoginPage'
+            return await self.page.login(self.pw.page, id, password)
+        
+        except TimeoutError:
+            print("페이지 로딩 타임아웃이 발생했습니다. 즉시 로그인 시도를 진행합니다.")
+            self.current_page = 'LoginPage'
+            return await self.page.login(self.pw.page, id, password)
+
         self.current_page = 'LoginPage'
         return await self.page.login(self.pw.page, id, password)
         ## Login인지 Main인지 판단, 하지만 일단 Login으로 전제하고 구현
