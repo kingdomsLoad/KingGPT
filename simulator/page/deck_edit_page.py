@@ -21,7 +21,9 @@ class DeckEditPage(IPage):
         await self.lineup.delete_heros(page)
         # 3. army-type 선택하기
         # 4. add_btn 3개 장수 추가하기
+        await self.lineup.add_heroes(page, heros)
         # 5. add_skills
+        await self.lineup.add_skills(page, skills)
         return 'DeckEditPage'
 
     # 함수 사용 예시
