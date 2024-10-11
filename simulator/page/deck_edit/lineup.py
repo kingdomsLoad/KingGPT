@@ -62,3 +62,62 @@ class Lineup:
                 await page.wait_for_selector(close_btn_selector, state="visible", timeout=500)
                 close_btn = page.locator(close_btn_selector)
                 await close_btn.click()
+
+    async def select_army_type(self, page: Page, army_type: str):
+        """
+        주어진 army_type에 해당하는 버튼을 클릭하고 선택이 완료될 때까지 대기합니다.
+        :param page: Playwright Page 객체
+        :param army_type: 선택할 군사 유형 (기병, 방패병, 궁병, 창병, 병기)
+        """
+        # 군사 유형과 해당 이미지 파일 매핑
+        army_type_mapping = {
+            "기병": "icon_qb@2x.png",
+            "방패병": "icon_db@2x.png",
+            "궁병": "icon_gb@2x.png",
+            "창병": "icon_qiangb@2x.png",
+            "병기": "icon_qx@2x.png"
+        }
+
+        # 입력된 army_type이 유효한지 확인
+        if army_type not in army_type_mapping:
+            raise ValueError(f"Unknown army_type: {army_type}. Valid types are: {', '.join(army_type_mapping.keys())}")
+
+        # 해당 army_type의 이미지 파일명
+        image_file = army_type_mapping[army_type]
+
+        # 버튼의 img src를 기반으로 선택자 생성
+        selector = f"img[src='/static/img/armyType/{image_file}']"
+
+        # 버튼 요소 찾기
+        button = page.locator(selector)
+
+        # 버튼이 존재하는지 확인
+        if not await button.count():
+            raise Exception(f"Button for army_type '{army_type}' not found.")
+
+        # 버튼 클릭
+        await button.click()
+
+        # 변경 사항이 반영될 때까지 대기
+        # 예를 들어, 선택된 버튼에 'active' 클래스가 추가되거나 이미지가 변경되는 경우를 기다립니다.
+        # 여기서는 이미지 파일명이 '_active'로 변경된다고 가정합니다.
+        active_image_file = image_file.replace("@2x.png", "_active@2x.png")
+        active_selector = f"img[src='/static/img/armyType/{active_image_file}']"
+
+        try:
+            await page.wait_for_selector(active_selector, timeout=5000)
+            print(f"Successfully selected army type: {army_type}")
+        except TimeoutError:
+            raise TimeoutError(f"Timeout while waiting for army type '{army_type}' to be selected.")
+
+
+        # await page.wait_for_selector(active_selector)
+
+        # # for attempt in range(50):
+        # #     count = await page.locator(active_selector).count()
+        # #     if count == 1:
+        # #         print(f"Successfully selected army type: {army_type}")
+        # #         return
+        # #     await asyncio.sleep(0.1)
+        
+        # raise TimeoutError(f"Timeout while waiting for army type '{army_type}' to be selected.")
