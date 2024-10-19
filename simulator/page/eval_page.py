@@ -115,22 +115,38 @@ class EvalPage(IPage):
     async def format_data_as_string(self, data) -> str:
         lines = []
 
-        # 장수 정보
+        # 1. Header: 방SAS
+        army_types = [hero['type'] for hero in data['heroes']]
+        # '방S', '방A', '방S' → '방SAS'
+        # assuming all types start with '방'
+        army_suffixes = [atype.replace('방', '') for atype in army_types]
+        header = '방' + ''.join(army_suffixes)
+        lines.append(header)
+
+        # 2. Hero 정보
         for hero in data['heroes']:
-            hero_info = f"장수: {hero['name']}, 병종: {hero['type']}, 스킬: {', '.join(hero['skills'])}, 병서: {', '.join(hero['bs'])}, 스텟: {hero['stat']}"
-            lines.append(hero_info)
-        
-        # 점수 정보
+            name = hero['name']
+            skills = ' '.join(hero['skills'])
+            # 병서는 마지막 항목이 스텟이므로 제외하고 공백 제거
+            bs = ' '.join([bs_item.replace(' ', '') for bs_item in hero['bs'][:-1]])
+            stat = hero['bs'][-1]
+            hero_line = f"{name} {skills} | {bs} {stat}"
+            lines.append(hero_line)
+
+        # 3. 빈 줄 추가
+        lines.append('')
+
+        # 4. 점수 정보
         scores = data['scores']
-        scores_info = f"PVP 점수: {scores['pvp']}, PVE 점수: {scores['pve']}"
-        lines.append(scores_info)
+        lines.append(f"pvp {scores['pvp']}")
+        lines.append(f"pve {scores['pve']}")
+        lines.append('')
 
-        # 억제관계 정보
+        # 5. 억제관계 정보
         restrictions = data['restrictions']
-        restrictions_info = ""
         for item, value in restrictions['items'].items():
-            restrictions_info += f", {item}: {value}"
-        lines.append(restrictions_info)
+            lines.append(f"{item} {value}")
 
-        # 전체 데이터 문자열로 결합
-        return " \n ".join(lines)
+        # 6. 전체 데이터 문자열로 결합
+        return "\n".join(lines)
+
