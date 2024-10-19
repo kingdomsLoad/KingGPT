@@ -43,25 +43,28 @@ class Lineup:
             for i in range(3)
             ]
 
-        for hero_index in range(0, 3):
-            for skill_index in range(0, 2):   
-                await skill_name_box_locators[hero_index][skill_index].click()
-                await page.wait_for_selector("uni-view.zf-popup", state="visible")
+        try:
+            for hero_index in range(0, 3):
+                for skill_index in range(0, 2):   
+                    await skill_name_box_locators[hero_index][skill_index].click()
+                    await page.wait_for_selector("uni-view.zf-popup", state="visible")
 
-                skill_text = skills[hero_index][skill_index]
+                    skill_text = skills[hero_index][skill_index]
 
-                # 전법 검색
-                selectors = "uni-view.zf-popup input"
-                await page.fill(selectors, skill_text)
+                    # 전법 검색
+                    selectors = "uni-view.zf-popup input"
+                    await page.fill(selectors, skill_text)
 
-                # 전법 클릭
-                element = page.locator(f"uni-view.zf-btn:has(:text-is(\"{skill_text}\"))")
-                await element.click()
+                    # 전법 클릭
+                    element = page.locator(f"uni-view.zf-btn:has(:text-is(\"{skill_text}\"))")
+                    await element.click()
 
-                close_btn_selector = "uni-view.zf-popup uni-image.close-btn"
-                await page.wait_for_selector(close_btn_selector, state="visible", timeout=500)
-                close_btn = page.locator(close_btn_selector)
-                await close_btn.click()
+                    close_btn_selector = "uni-view.zf-popup uni-image.close-btn"
+                    await page.wait_for_selector(close_btn_selector, state="visible", timeout=500)
+                    close_btn = page.locator(close_btn_selector)
+                    await close_btn.click()
+        except:
+            return
 
     async def select_army_type(self, page: Page, army_type: str):
         """

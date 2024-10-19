@@ -2,9 +2,11 @@ from playwright.async_api import async_playwright, Page, Browser, Playwright, Ti
 from simulator.page.login_page import LoginPage
 from simulator.page.main_page import MainPage
 from simulator.page.deck_edit_page import DeckEditPage
+from simulator.page.eval_page import EvalPage
 from typing import Union, TYPE_CHECKING, List
 from functools import wraps
 from simulator.path_finder.path_finder import bfs_all_paths, get_path
+import asyncio
 
 if TYPE_CHECKING:
     from simulator import Simulator
@@ -30,8 +32,11 @@ class Simulator:
         self.pages = {
             'LoginPage': LoginPage(),
             'MainPage': MainPage(),
-            'DeckEditPage': DeckEditPage()
+            'DeckEditPage': DeckEditPage(),
+            'EvalPage': EvalPage()
         }
+        self.response: str = None
+        self.return_queue = asyncio.Queue()
 
     async def start_browser(self, playwright: Playwright):
         self.pw.browser = await playwright.chromium.launch(headless=False)
@@ -42,7 +47,7 @@ class Simulator:
         await self.pw.browser.close()
 
     @property
-    def page(self) -> Union[LoginPage, MainPage, DeckEditPage]:
+    def page(self) -> Union[LoginPage, MainPage, DeckEditPage, EvalPage]:
         return self.pages[self.current_page]
 
     async def navigate(self, target_page: str):
@@ -79,6 +84,7 @@ class Simulator:
     async def season(self, season: str):
         await self.page.change_season(self.pw.page, season)
 
+    @update_current_page
     async def editdeck(self, army_type: str, heros: List[str], skills: List[List[str]]):
         # 유효성 검사
         assert len(heros) == 3, "hero는 보통 3명이여야 합니다." # 예외가 있겠지만, 일단 3명으로 만들자.
@@ -88,7 +94,13 @@ class Simulator:
 
         # path_find
         await self.navigate('DeckEditPage')
-        await self.page.edit_deck(self.pw.page, army_type, heros, skills)
+        return await self.page.edit_deck(self.pw.page, army_type, heros, skills)
+
+    @update_current_page
+    async def eval(self):
+        await self.navigate('EvalPage')
+        return await self.page.eval(self.pw.page)
+        # await self.page.eval_capture(self.pw.page)
 
 simulator = Simulator()
 
@@ -102,8 +114,10 @@ async def crawl_website(content: str) -> str:
         await simulator.language("한국어")
         await simulator.season('2')
         await simulator.editdeck('방패병', ['유비', '관우', '장비'], [["함진영", "잠피기봉"], ["적진 함락","일망타진"], ["기세등등", "낙봉"]])
+        await simulator.eval()
 
-        crawled_content = await simulator.pw.page.content()
+        # crawled_content = await simulator.pw.page.content()
+        data_plain_text = simulator.page.data_plain_text
         await simulator.close_browser()
 
-    return crawled_content[:100] + ' From UDP Server by python'
+    return data_plain_text + ' From UDP Server by python'
